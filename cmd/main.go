@@ -61,6 +61,7 @@ func main() {
 		runtimeNamespace             string
 		managementURL                string
 		netbirdClientImage           string
+		kubeAPIProxyImage            string
 		clusterName                  string
 		namespacedNetworks           bool
 		clusterDNS                   string
@@ -72,6 +73,7 @@ func main() {
 	flag.StringVar(&runtimeNamespace, "runtime-namespace", "", "Namespace the controller is running in")
 	flag.StringVar(&managementURL, "netbird-management-url", "https://api.netbird.io", "Management service URL")
 	flag.StringVar(&netbirdClientImage, "netbird-client-image", "", "Image for netbird client container")
+	flag.StringVar(&kubeAPIProxyImage, "kubeapi-proxy-image", "", "Image for the ClusterProxy's Kubernetes API proxy")
 	flag.StringVar(
 		&clusterName,
 		"cluster-name",
@@ -141,6 +143,9 @@ func main() {
 	}
 	if netbirdClientImage == "" {
 		netbirdClientImage = version.NetbirdClientImage
+	}
+	if kubeAPIProxyImage == "" {
+		kubeAPIProxyImage = version.KubeApiProxyImage
 	}
 
 	defaultLabelsMap := make(map[string]string)
@@ -329,6 +334,7 @@ func main() {
 			Client:        mgr.GetClient(),
 			ApiKey:        netbirdAPIKey,
 			ManagementURL: managementURL,
+			ProxyImage:    kubeAPIProxyImage,
 		}).SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "Failed to create controller", "controller", "ClusterProxy")
 			os.Exit(1)

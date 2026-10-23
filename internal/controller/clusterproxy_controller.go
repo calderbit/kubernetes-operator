@@ -32,6 +32,8 @@ type ClusterProxyReconciler struct {
 
 	ApiKey        string
 	ManagementURL string
+	// ProxyImage is the image of the API proxy; empty means version.KubeApiProxyImage.
+	ProxyImage string
 }
 
 // +kubebuilder:rbac:groups=netbird.io,resources=clusterproxies,verbs=get;list;watch;create;update;patch;delete
@@ -124,7 +126,7 @@ func (r *ClusterProxyReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			WithServiceAccountName(clusterProxy.Spec.ServiceAccountName).
 			WithContainers(corev1ac.Container().
 				WithName("proxy").
-				WithImage(version.KubeApiProxyImage).
+				WithImage(r.proxyImage()).
 				WithArgs(
 					"--setup-key",
 					"$(SETUP_KEY)",
@@ -203,4 +205,11 @@ func (r *ClusterProxyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&nbv1alpha1.SetupKey{}).
 		Owns(&appsv1.Deployment{}).
 		Complete(r)
+}
+
+func (r *ClusterProxyReconciler) proxyImage() string {
+	if r.ProxyImage != "" {
+		return r.ProxyImage
+	}
+	return version.KubeApiProxyImage
 }

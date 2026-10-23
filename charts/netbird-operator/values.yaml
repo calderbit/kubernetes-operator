@@ -159,6 +159,10 @@ netbirdAPI:
 
 #routingClientImage: "netbirdio/netbird:latest"
 
+# Image of the ClusterProxy's Kubernetes API proxy; default: the one this
+# operator version pins.
+#kubeAPIProxyImage: "ghcr.io/netbirdio/netbird-kubeapi-proxy:v0.0.4"
+
 gatewayAPI:
   enabled: false
 
